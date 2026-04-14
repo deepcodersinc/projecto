@@ -1,0 +1,6 @@
+{
+  "id": "stripe",
+  "name": "Stripe",
+  "description": "Stripe payments and billing integration.",
+  "requiredEnvVars": ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
+}

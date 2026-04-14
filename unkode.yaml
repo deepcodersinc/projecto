@@ -1,6 +1,6 @@
 _meta:
-  last_sync_commit: 3aa86e838298bd098400bee24091459e045453a6
-  last_sync: 2026-04-14T19:02:12Z
+  last_sync_commit: 4de6933739d5be803e878b37610fb8199d13b94e
+  last_sync: 2026-04-14T19:30:00Z
   version: 1
 
 architecture:
@@ -106,8 +106,8 @@ architecture:
     path: plugins
     kind: library
     tech: [typescript, react]
-    role: Pluggable integrations for auth providers, embeds, issue trackers, analytics, and storage backends.
-    depends_on: [Shared Core, API Server]
+    role: Pluggable integrations for auth providers, embeds, issue trackers, analytics, payments, and storage backends.
+    depends_on: [Shared Core, API Server, Stripe]
     components:
       - name: Auth Providers
         path: plugins/google
@@ -117,10 +117,13 @@ architecture:
         description: Integrations with github, gitlab, linear, and jira for issue and PR embeds.
       - name: Content Import and Embeds
         path: plugins/notion
-        description: Notion import and embed plugins for figma, iframely, diagrams, and zapier.
+        description: Notion import and embed plugins for figma, iframely, and diagrams.
       - name: Analytics
         path: plugins/googleanalytics
         description: Analytics integrations for Google Analytics and Matomo.
+      - name: Payments
+        path: plugins/stripe
+        description: Stripe payments and billing integration with webhook and API routes.
       - name: Enterprise and Infra
         path: plugins/enterprise
         description: Enterprise features plus storage, search-postgres, and webhooks plugins.
@@ -170,6 +173,11 @@ architecture:
     type: external
     kind: api
     role: URL unfurling and rich content preview service for embedded links.
+
+  - name: Stripe
+    type: external
+    kind: api
+    role: Payments and billing platform used for subscriptions and webhook-driven billing events.
 
 deployment:
   - name: Web Dyno
