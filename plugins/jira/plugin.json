@@ -1,0 +1,6 @@
+{
+  "id": "jira",
+  "name": "Jira",
+  "description": "Unfurl Jira issue URLs inside documents.",
+  "priority": 10
+}

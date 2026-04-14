@@ -1,6 +1,6 @@
 _meta:
-  last_sync_commit: 46f1f99ce6e42d9925d500b5e034076bbd2bb19b
-  last_sync: 2026-04-14T14:26:52Z
+  last_sync_commit: 68e9c119b56bd40cdab824a42584d82d617c310f
+  last_sync: 2026-04-14T15:00:00Z
   version: 1
 
 architecture:
@@ -86,9 +86,6 @@ architecture:
       - name: Emails
         path: server/emails
         description: React-based transactional email templates rendered for notifications and invites.
-      - name: Onboarding Templates
-        path: server/onboarding
-        description: Markdown templates seeded into new teams as onboarding documents.
       - name: Server Editor Helpers
         path: server/editor
         description: Server-side helpers for parsing and rewriting ProseMirror documents.
@@ -169,7 +166,7 @@ architecture:
         description: SSO and identity plugins (azure, google, oidc, slack, passkeys).
       - name: Third-Party Integrations
         path: plugins
-        description: Service integrations (notion, github, gitlab, linear, figma, discord, zapier, webhooks).
+        description: Service integrations (notion, github, gitlab, linear, jira, figma, discord, zapier, webhooks).
       - name: Embed Providers
         path: plugins/iframely
         description: Iframely-based unfurling and rich embeds for external URLs.
@@ -184,13 +181,26 @@ architecture:
         description: Inbound email handling for creating documents from messages.
       - name: Analytics Plugins
         path: plugins
-        description: Frontend analytics adapters (googleanalytics, matomo, umami).
+        description: Frontend analytics adapters (googleanalytics, matomo).
       - name: Diagrams Plugin
         path: plugins/diagrams
         description: Renders Mermaid and other diagram syntaxes inside documents.
       - name: Enterprise Plugin
         path: plugins/enterprise
         description: Features reserved for the enterprise distribution of Outline.
+
+  - name: CLI Tools
+    path: cli
+    kind: cli
+    tech: [TypeScript, Node.js, Commander]
+    role: Command-line utilities for administering an Outline instance (document import/export).
+    depends_on:
+      - API Server
+      - Shared Library
+    components:
+      - name: CLI Commands
+        path: cli/commands
+        description: Individual subcommands such as document export and import.
 
   - name: Shared Library
     path: shared

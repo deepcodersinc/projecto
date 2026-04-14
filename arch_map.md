@@ -16,7 +16,6 @@ graph LR
             API_Server_Presenters["Presenters"]
             API_Server_Middlewares["Middlewares"]
             API_Server_Emails["Emails"]
-            API_Server_Onboarding_Templates["Onboarding Templates"]
             API_Server_Server_Editor_Helpers["Server Editor Helpers"]
         end
         Realtime_Gateway["Realtime Gateway (TypeScript, Socket.IO, Redis)"]
@@ -52,6 +51,9 @@ graph LR
         Plugins_Analytics_Plugins(["Analytics Plugins"])
         Plugins_Diagrams_Plugin(["Diagrams Plugin"])
         Plugins_Enterprise_Plugin(["Enterprise Plugin"])
+    end
+    subgraph CLI_Tools["CLI Tools (TypeScript, Node.js, Commander)"]
+        CLI_Tools_CLI_Commands>"CLI Commands"]
     end
     subgraph Shared_Library["Shared Library (TypeScript, React, ProseMirror)"]
         Shared_Library_ProseMirror_Editor(["ProseMirror Editor"])
@@ -102,6 +104,8 @@ graph LR
     Admin_Service --> Async_Worker
     Plugins --> API_Server
     Plugins --> Shared_Library
+    CLI_Tools --> API_Server
+    CLI_Tools --> Shared_Library
 ```
 
 ---
@@ -141,7 +145,6 @@ HTTP API service that authenticates users and exposes CRUD endpoints for every r
 - **Presenters** — Serializers that turn Sequelize models into the JSON shapes consumed by the client.
 - **Middlewares** — Shared Koa middleware for auth, rate limiting, validation, and request context.
 - **Emails** — React-based transactional email templates rendered for notifications and invites.
-- **Onboarding Templates** — Markdown templates seeded into new teams as onboarding documents.
 - **Server Editor Helpers** — Server-side helpers for parsing and rewriting ProseMirror documents.
 
 ### Realtime Gateway `TypeScript, Socket.IO, Redis`
@@ -201,14 +204,24 @@ Modular integrations bundled with Outline that extend auth, storage, search, and
 **Depends on:** API Server, Shared Library
 
 - **Auth Providers** — SSO and identity plugins (azure, google, oidc, slack, passkeys).
-- **Third-Party Integrations** — Service integrations (notion, github, gitlab, linear, figma, discord, zapier, webhooks).
+- **Third-Party Integrations** — Service integrations (notion, github, gitlab, linear, jira, figma, discord, zapier, webhooks).
 - **Embed Providers** — Iframely-based unfurling and rich embeds for external URLs.
 - **Storage Backends** — Pluggable file storage drivers including local disk and S3-compatible providers.
 - **Search Backends** — PostgreSQL-backed full-text search implementation.
 - **Email Plugin** — Inbound email handling for creating documents from messages.
-- **Analytics Plugins** — Frontend analytics adapters (googleanalytics, matomo, umami).
+- **Analytics Plugins** — Frontend analytics adapters (googleanalytics, matomo).
 - **Diagrams Plugin** — Renders Mermaid and other diagram syntaxes inside documents.
 - **Enterprise Plugin** — Features reserved for the enterprise distribution of Outline.
+
+### CLI Tools `TypeScript, Node.js, Commander`
+
+Command-line utilities for administering an Outline instance (document import/export).
+
+**Path:** `cli`
+
+**Depends on:** API Server, Shared Library
+
+- **CLI Commands** — Individual subcommands such as document export and import.
 
 ### Shared Library `TypeScript, React, ProseMirror`
 
