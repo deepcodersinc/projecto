@@ -42,6 +42,7 @@ graph LR
         Plugins_Issue_Trackers(["Issue Trackers"])
         Plugins_Content_Import_and_Embeds(["Content Import and Embeds"])
         Plugins_Analytics(["Analytics"])
+        Plugins_Payments(["Payments"])
         Plugins_Enterprise_and_Infra(["Enterprise and Infra"])
     end
     subgraph CLI_Tools["CLI Tools (typescript, node)"]
@@ -55,6 +56,7 @@ graph LR
     Sentry[["Sentry"]]
     OAuth_Providers[["OAuth Providers"]]
     Iframely[["Iframely"]]
+    Stripe[["Stripe"]]
 
     Web_Frontend --> Shared_Core
     Web_Frontend --> API_Server
@@ -69,6 +71,7 @@ graph LR
     Background_Worker --> API_Server
     Plugins --> Shared_Core
     Plugins --> API_Server
+    Plugins --> Stripe
     CLI_Tools --> API_Server
     CLI_Tools --> Shared_Core
 ```
@@ -133,16 +136,17 @@ Isomorphic code shared across frontend, backend, CLI, and plugins including type
 
 ### Plugins `typescript, react`
 
-Pluggable integrations for auth providers, embeds, issue trackers, analytics, and storage backends.
+Pluggable integrations for auth providers, embeds, issue trackers, analytics, payments, and storage backends.
 
 **Path:** `plugins`
 
-**Depends on:** Shared Core, API Server
+**Depends on:** Shared Core, API Server, Stripe
 
 - **Auth Providers** — OAuth and OIDC integrations including google, azure, discord, slack, oidc, email, and passkeys.
 - **Issue Trackers** — Integrations with github, gitlab, linear, and jira for issue and PR embeds.
-- **Content Import and Embeds** — Notion import and embed plugins for figma, iframely, diagrams, and zapier.
+- **Content Import and Embeds** — Notion import and embed plugins for figma, iframely, and diagrams.
 - **Analytics** — Analytics integrations for Google Analytics and Matomo.
+- **Payments** — Stripe payments and billing integration with webhook and API routes.
 - **Enterprise and Infra** — Enterprise features plus storage, search-postgres, and webhooks plugins.
 
 ### CLI Tools `typescript, node`
