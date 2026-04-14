@@ -1,0 +1,206 @@
+_meta:
+  last_sync_commit: 3aa86e838298bd098400bee24091459e045453a6
+  last_sync: 2026-04-14T19:02:12Z
+  version: 1
+
+architecture:
+  - name: Web Frontend
+    path: app
+    kind: frontend
+    tech: [typescript, react]
+    role: Single-page React application that renders the collaborative knowledge base UI for end users.
+    depends_on: [Shared Core, API Server]
+    components:
+      - name: Scenes and Routes
+        path: app/scenes
+        description: Page-level React components and route definitions for dashboard, documents, settings, and auth flows.
+      - name: UI Components
+        path: app/components
+        description: Reusable React components including editor, dialogs, breadcrumbs, and navigation elements.
+      - name: Client Stores
+        path: app/stores
+        description: MobX stores that manage client-side state and sync with the backend.
+      - name: Client Models
+        path: app/models
+        description: Frontend data models and proxies for server entities.
+      - name: Actions and Menus
+        path: app/actions
+        description: Command palette actions and contextual menus wired to keyboard shortcuts.
+      - name: Hooks and Utils
+        path: app/hooks
+        description: Custom React hooks and utilities for i18n, plugin management, and error reporting.
+
+  - name: API Server
+    path: server
+    kind: backend
+    tech: [typescript, koa, sequelize]
+    role: Node.js backend exposing REST APIs, WebSocket endpoints, and real-time collaboration services.
+    depends_on: [Shared Core, PostgreSQL, Redis, AWS S3, SMTP, Sentry]
+    components:
+      - name: Routes and Middlewares
+        path: server/routes
+        description: Koa routers and middleware handling API endpoints, authentication, and rate limiting.
+      - name: Domain Models
+        path: server/models
+        description: Sequelize ORM models for documents, collections, users, teams, and related entities.
+      - name: Business Commands
+        path: server/commands
+        description: Domain command handlers for creating, importing, exporting, and provisioning resources.
+      - name: Authorization Policies
+        path: server/policies
+        description: Permission checks that gate access to resources based on user role and team membership.
+      - name: Presenters
+        path: server/presenters
+        description: Response formatters that shape API payloads returned to clients.
+      - name: Realtime Collaboration
+        path: server/collaboration
+        description: Hocuspocus extensions for authenticated real-time collaborative document editing.
+      - name: Transactional Emails
+        path: server/emails
+        description: Email templates and dispatch logic for invites, shares, and notifications.
+      - name: Storage Adapters
+        path: server/storage
+        description: Database, Redis, and file storage (local or S3) connection adapters.
+      - name: Service Entrypoints
+        path: server/services
+        description: Process entrypoints for web, worker, websockets, collaboration, cron, and admin services.
+
+  - name: Background Worker
+    path: server/queues
+    kind: worker
+    tech: [typescript, bull]
+    role: Bull-based job queue that processes async tasks such as exports, imports, notifications, and cleanup.
+    depends_on: [Redis, PostgreSQL, API Server]
+    components:
+      - name: Queue Processors
+        path: server/queues/processors
+        description: Handlers that consume queued jobs and dispatch them to task implementations.
+      - name: Tasks
+        path: server/queues/tasks
+        description: Individual async task implementations invoked by processors.
+
+  - name: Shared Core
+    path: shared
+    kind: library
+    tech: [typescript, react]
+    role: Isomorphic code shared across frontend, backend, CLI, and plugins including types, editor, and i18n.
+    depends_on: []
+    components:
+      - name: Editor Framework
+        path: shared/editor
+        description: ProseMirror-based editor infrastructure with commands, extensions, and embeds.
+      - name: Shared Components
+        path: shared/components
+        description: React components reused between app and plugins such as icons and dialogs.
+      - name: Internationalization
+        path: shared/i18n
+        description: Translation catalogues and helpers for 30+ supported languages.
+      - name: Types and Constants
+        path: shared/types.ts
+        description: Cross-cutting TypeScript types and application-wide constants.
+      - name: Utilities
+        path: shared/utils
+        description: Shared helpers for validation, time, formatting, and common operations.
+
+  - name: Plugins
+    path: plugins
+    kind: library
+    tech: [typescript, react]
+    role: Pluggable integrations for auth providers, embeds, issue trackers, analytics, and storage backends.
+    depends_on: [Shared Core, API Server]
+    components:
+      - name: Auth Providers
+        path: plugins/google
+        description: OAuth and OIDC integrations including google, azure, discord, slack, oidc, email, and passkeys.
+      - name: Issue Trackers
+        path: plugins/github
+        description: Integrations with github, gitlab, linear, and jira for issue and PR embeds.
+      - name: Content Import and Embeds
+        path: plugins/notion
+        description: Notion import and embed plugins for figma, iframely, diagrams, and zapier.
+      - name: Analytics
+        path: plugins/googleanalytics
+        description: Analytics integrations for Google Analytics and Matomo.
+      - name: Enterprise and Infra
+        path: plugins/enterprise
+        description: Enterprise features plus storage, search-postgres, and webhooks plugins.
+
+  - name: CLI Tools
+    path: cli
+    kind: cli
+    tech: [typescript, node]
+    role: Command-line utilities for exporting and importing workspace data.
+    depends_on: [API Server, Shared Core]
+    components:
+      - name: Commands
+        path: cli/commands
+        description: CLI entrypoints for export and import operations against the database.
+
+  - name: PostgreSQL
+    type: external
+    kind: database
+    role: Primary relational database storing documents, collections, users, teams, and all domain data.
+
+  - name: Redis
+    type: external
+    kind: cache
+    role: In-memory store used for caching, pub/sub, session state, Bull queues, and collaboration coordination.
+
+  - name: AWS S3
+    type: external
+    kind: storage
+    role: Object storage for file attachments, avatars, and exported archives (S3-compatible).
+
+  - name: SMTP
+    type: external
+    kind: api
+    role: Outbound email transport via Nodemailer for transactional messages and notifications.
+
+  - name: Sentry
+    type: external
+    kind: api
+    role: Error tracking and performance monitoring for both client and server.
+
+  - name: OAuth Providers
+    type: external
+    kind: api
+    role: Third-party identity providers including Google, Azure AD, Slack, Discord, GitHub, GitLab, Linear, Notion, Figma, and generic OIDC.
+
+  - name: Iframely
+    type: external
+    kind: api
+    role: URL unfurling and rich content preview service for embedded links.
+
+deployment:
+  - name: Web Dyno
+    tech: [heroku, node]
+    role: Runs the HTTP API, WebSocket server, and real-time collaboration services.
+    hosts: [API Server, Web Frontend]
+    depends_on: [Redis Instance, Postgres Instance, S3 Bucket]
+
+  - name: Worker Dyno
+    tech: [heroku, node]
+    role: Runs the Bull background job processor for async tasks.
+    hosts: [Background Worker]
+    depends_on: [Redis Instance, Postgres Instance]
+
+  - name: Postgres Instance
+    tech: [docker-compose, postgres]
+    role: PostgreSQL container provisioned via docker-compose for local and self-hosted deployments.
+    hosts: [PostgreSQL]
+
+  - name: Redis Instance
+    tech: [docker-compose, redis]
+    role: Redis container provisioned via docker-compose for cache, queues, and pub/sub.
+    hosts: [Redis]
+
+  - name: S3 Bucket
+    tech: [aws, s3]
+    role: S3-compatible object storage configured via environment variables.
+    hosts: [AWS S3]
+
+  - name: App Container
+    tech: [docker, node]
+    role: Multi-stage Docker image that builds and runs the full application on Node.js 24.
+    hosts: [API Server, Web Frontend, Background Worker]
+    depends_on: [Postgres Instance, Redis Instance, S3 Bucket]
